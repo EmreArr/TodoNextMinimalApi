@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace MinAPISeparateFile;
 
@@ -8,10 +10,18 @@ public static class ProductEndpoints
     {
         RouteGroupBuilder productItems = app.MapGroup("/products");
 
-        productItems.MapGet("/", GetAllProducts);
+        productItems.MapGet("/", GetAllProducts)
+        .WithDescription("Some description get")
+        .WithMetadata()
+        .WithOpenApi();
+
         productItems.MapGet("/available", GetAvailableProducts);
         productItems.MapGet("/{id}", GetProduct);
-        productItems.MapPost("/", CreateProduct);
+        productItems.MapPost("/", CreateProduct)
+        .WithMetadata(new SwaggerOperationAttribute("summary001", "description001"))
+        // with description not work with metadata, metadata > description
+        .WithDescription("Some description post")
+        .WithOpenApi();
         productItems.MapPut("/{id}", UpdateProduct);
         productItems.MapDelete("/{id}", DeleteProduct);
     }
@@ -34,6 +44,8 @@ public static class ProductEndpoints
                 : TypedResults.NotFound();
     }
 
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     static async Task<IResult> CreateProduct(Product product, ProductDb db)
     {
         db.Products.Add(product);
