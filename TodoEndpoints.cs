@@ -6,7 +6,7 @@ public static class TodoEndpoints
 {
     public static void Map(WebApplication app)
     {
-        RouteGroupBuilder todoItems = app.MapGroup("/todoitems");
+        RouteGroupBuilder todoItems = app.MapGroup("/todoitems").RequireAuthorization("admin_greetings");
 
         todoItems.MapGet("/", GetAllTodos);
         todoItems.MapGet("/complete", GetCompleteTodos);
